@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}Customer Churn Prediction & Analytics Dashboard{% endblock %}</title>
+  
+  <!-- Google Fonts & FontAwesome -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- Custom Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <div class="brand-logo">
+          <i class="fa-solid fa-chart-line"></i>
+        </div>
+        <div class="brand-text">
+          <h2>ChurnVision</h2>
+          <span>Analytics AI</span>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <a href="{{ url_for('dashboard') }}" class="nav-item {% if request.endpoint == 'dashboard' %}active{% endif %}">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="{{ url_for('customers') }}" class="nav-item {% if request.endpoint == 'customers' %}active{% endif %}">
+          <i class="fa-solid fa-users"></i>
+          <span>Customers</span>
+        </a>
+        <a href="{{ url_for('predict_page') }}" class="nav-item {% if request.endpoint == 'predict_page' %}active{% endif %}">
+          <i class="fa-solid fa-wand-magic-sparkles"></i>
+          <span>Churn Predictor</span>
+        </a>
+        <a href="{{ url_for('analytics') }}" class="nav-item {% if request.endpoint == 'analytics' %}active{% endif %}">
+          <i class="fa-solid fa-chart-column"></i>
+          <span>Analytics</span>
+        </a>
+        <a href="{{ url_for('history') }}" class="nav-item {% if request.endpoint == 'history' %}active{% endif %}">
+          <i class="fa-solid fa-clock-rotate-left"></i>
+          <span>Prediction Logs</span>
+        </a>
+        <a href="{{ url_for('reports') }}" class="nav-item {% if request.endpoint == 'reports' %}active{% endif %}">
+          <i class="fa-solid fa-file-export"></i>
+          <span>Reports & CSV</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile">
+          <div class="avatar">
+            {{ session.get('username', 'A')[0].upper() }}
+          </div>
+          <div class="user-info">
+            <h4>{{ session.get('username', 'Admin') }}</h4>
+            <p>System Manager</p>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Body Wrapper -->
+    <div class="main-wrapper">
+      <header class="topbar">
+        <div class="page-header">
+          <h1>{% block page_title %}Dashboard Overview{% endblock %}</h1>
+        </div>
+        <div class="topbar-actions">
+          <a href="{{ url_for('logout') }}" class="btn-logout" title="Sign out of application">
+            <i class="fa-solid fa-right-from-bracket"></i>
+            <span>Logout</span>
+          </a>
+        </div>
+      </header>
+
+      <main class="content-body">
+        {% block content %}{% endblock %}
+      </main>
+    </div>
+  </div>
+
+  {% block scripts %}{% endblock %}
+</body>
+</html>

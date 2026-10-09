@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Prediction History - ChurnVision{% endblock %}
+{% block page_title %}ML Prediction Audit History Log{% endblock %}
+
+{% block content %}
+<div class="glass-card" style="margin-bottom: 24px; padding: 20px;">
+  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px;">
+    <div>
+      <h3 style="font-size: 18px; color: var(--text-primary);">Historical Model Prediction Records</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); margin-top: 4px;">
+        All single-customer & batch ML churn predictions stored in SQLite database.
+      </p>
+    </div>
+    <div style="display: flex; gap: 12px;">
+      <a href="{{ url_for('export_predictions_csv') }}" class="btn btn-secondary">
+        <i class="fa-solid fa-file-csv"></i> Export Logs CSV
+      </a>
+      <button class="btn btn-secondary" style="color: var(--accent-rose); border-color: rgba(244,63,94,0.3);" onclick="clearHistory()">
+        <i class="fa-solid fa-trash"></i> Clear History
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="glass-card">
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Log ID</th>
+          <th>Customer Name</th>
+          <th>Age / Gender</th>
+          <th>Tenure</th>
+          <th>Monthly Fee</th>
+          <th>Contract</th>
+          <th>Prediction Result</th>
+          <th>Churn Prob.</th>
+          <th>Risk Tier</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody id="history-table-body">
+        <tr>
+          <td colspan="10" style="text-align: center; color: var(--text-muted); padding: 32px;">Loading prediction history...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', loadHistory);
+
+async function loadHistory() {
+  try {
+    const res = await fetch('/api/history');
+    const data = await res.json();
+    renderHistoryTable(data.predictions || []);
+  } catch (err) {
+    console.error("Error loading history:", err);
+  }
+}
+
+function renderHistoryTable(list) {
+  const tbody = document.getElementById('history-table-body');
+  if (!list || list.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="10" style="text-align: center; color: var(--text-muted); padding: 32px;">No prediction records logged yet. Run a prediction on the Churn Predictor page!</td></tr>`;
+    return;
+  }
+  
+  tbody.innerHTML = list.map(h => {
+    let riskClass = 'badge-low';
+    if (h.risk_level === 'High') riskClass = 'badge-high';
+    else if (h.risk_level === 'Medium') riskClass = 'badge-med';
+    
+    let predClass = h.prediction_result === 'Yes' ? 'badge-high' : 'badge-low';
+    
+    return `
+      <tr>
+        <td>#${h.id}</td>
+        <td><strong>${h.customer_name}</strong></td>
+        <td>${h.age} yrs (${h.gender})</td>
+        <td>${h.tenure} mos</td>
+        <td>$${parseFloat(h.monthly_charges).toFixed(2)}</td>
+        <td>${h.contract}</td>
+        <td><span class="badge ${predClass}">${h.prediction_result === 'Yes' ? 'Churn (Yes)' : 'Retain (No)'}</span></td>
+        <td><strong>${h.churn_probability}%</strong></td>
+        <td><span class="badge ${riskClass}">${h.risk_level}</span></td>
+        <td style="font-size: 12px; color: var(--text-muted);">${h.timestamp}</td>
+      </tr>
+    `;
+  }).join('');
+}
+
+async function clearHistory() {
+  if (!confirm("Are you sure you want to clear all prediction history logs?")) return;
+  try {
+    const res = await fetch('/api/history/clear', { method: 'POST' });
+    const data = await res.json();
+    if (data.status === 'success') {
+      loadHistory();
+    }
+  } catch (err) {
+    console.error("Failed to clear history:", err);
+  }
+}
+</script>
+{% endblock %}

@@ -1,0 +1,162 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Overview - Customer Churn Analytics{% endblock %}
+{% block page_title %}Dashboard Executive Summary{% endblock %}
+
+{% block content %}
+<!-- Top Metrics Grid -->
+<div class="metrics-grid">
+  <div class="glass-card metric-card">
+    <div class="metric-info">
+      <span>Total Customers</span>
+      <h3 id="stat-total">--</h3>
+      <div class="metric-sub positive"><i class="fa-solid fa-users me-1"></i> Active Database</div>
+    </div>
+    <div class="metric-icon indigo">
+      <i class="fa-solid fa-users"></i>
+    </div>
+  </div>
+
+  <div class="glass-card metric-card">
+    <div class="metric-info">
+      <span>Churned Customers</span>
+      <h3 id="stat-churned">--</h3>
+      <div class="metric-sub negative"><i class="fa-solid fa-user-minus me-1"></i> Left Service</div>
+    </div>
+    <div class="metric-icon rose">
+      <i class="fa-solid fa-user-xmark"></i>
+    </div>
+  </div>
+
+  <div class="glass-card metric-card">
+    <div class="metric-info">
+      <span>Active Customers</span>
+      <h3 id="stat-active">--</h3>
+      <div class="metric-sub positive"><i class="fa-solid fa-user-check me-1"></i> Retained</div>
+    </div>
+    <div class="metric-icon emerald">
+      <i class="fa-solid fa-user-check"></i>
+    </div>
+  </div>
+
+  <div class="glass-card metric-card">
+    <div class="metric-info">
+      <span>Overall Churn Rate</span>
+      <h3 id="stat-rate">--%</h3>
+      <div class="metric-sub warning" id="stat-rate-sub"><i class="fa-solid fa-percent me-1"></i> Account Loss %</div>
+    </div>
+    <div class="metric-icon amber">
+      <i class="fa-solid fa-chart-line-down"></i>
+    </div>
+  </div>
+
+  <div class="glass-card metric-card">
+    <div class="metric-info">
+      <span>High-Risk Customers</span>
+      <h3 id="stat-high-risk">--</h3>
+      <div class="metric-sub negative"><i class="fa-solid fa-triangle-exclamation me-1"></i> Action Needed</div>
+    </div>
+    <div class="metric-icon rose">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+    </div>
+  </div>
+
+  <div class="glass-card metric-card">
+    <div class="metric-info">
+      <span>Avg Customer Tenure</span>
+      <h3 id="stat-tenure">--</h3>
+      <div class="metric-sub positive"><i class="fa-solid fa-calendar me-1"></i> Months</div>
+    </div>
+    <div class="metric-icon cyan">
+      <i class="fa-solid fa-business-time"></i>
+    </div>
+  </div>
+</div>
+
+<!-- ML Performance Header Banner -->
+<div class="glass-card" style="margin-bottom: 32px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(139, 92, 246, 0.05));">
+  <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 20px;">
+    <div>
+      <h3 style="font-size: 18px; color: var(--text-primary); margin-bottom: 4px;">
+        <i class="fa-solid fa-microchip me-2" style="color: var(--accent-primary);"></i>
+        Machine Learning Engine Status: Active (Random Forest Classifier)
+      </h3>
+      <p style="font-size: 13px; color: var(--text-secondary);">
+        Model accuracy and predictive risk scoring based on standard dataset evaluations.
+      </p>
+    </div>
+    <div style="display: flex; gap: 16px; flex-wrap: wrap;">
+      <div class="badge badge-low" style="padding: 8px 16px; font-size: 13px;">
+        Accuracy: <strong id="ml-acc">--%</strong>
+      </div>
+      <div class="badge badge-low" style="padding: 8px 16px; font-size: 13px;">
+        Precision: <strong id="ml-prec">--%</strong>
+      </div>
+      <div class="badge badge-low" style="padding: 8px 16px; font-size: 13px;">
+        Recall: <strong id="ml-rec">--%</strong>
+      </div>
+      <div class="badge badge-low" style="padding: 8px 16px; font-size: 13px;">
+        F1 Score: <strong id="ml-f1">--%</strong>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Charts Section -->
+<div class="charts-grid">
+  <div class="glass-card">
+    <div class="chart-card-header">
+      <h3><i class="fa-solid fa-pie-chart" style="color: var(--accent-primary);"></i> Customer Churn Distribution</h3>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-churn-dist"></canvas>
+    </div>
+  </div>
+
+  <div class="glass-card">
+    <div class="chart-card-header">
+      <h3><i class="fa-solid fa-chart-simple" style="color: var(--accent-cyan);"></i> ML Feature Importance Drivers</h3>
+    </div>
+    <div class="chart-container">
+      <canvas id="chart-feature-imp"></canvas>
+    </div>
+  </div>
+</div>
+
+<!-- High Risk Customers Watchlist -->
+<div class="glass-card">
+  <div class="chart-card-header">
+    <h3><i class="fa-solid fa-shield-cat" style="color: var(--accent-rose);"></i> High-Risk Customer Watchlist</h3>
+    <a href="{{ url_for('customers') }}?risk=High" class="btn btn-secondary btn-sm">
+      <i class="fa-solid fa-arrow-right"></i> View All High Risk
+    </a>
+  </div>
+
+  <div class="table-responsive">
+    <table class="data-table">
+      <thead>
+        <tr>
+          <th>Customer ID</th>
+          <th>Name</th>
+          <th>Contract</th>
+          <th>Tenure</th>
+          <th>Monthly Charge</th>
+          <th>Support Calls</th>
+          <th>Churn Prob.</th>
+          <th>Risk Tier</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody id="watchlist-body">
+        <tr>
+          <td colspan="9" style="text-align: center; color: var(--text-muted); padding: 24px;">Loading watchlist...</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
+{% endblock %}

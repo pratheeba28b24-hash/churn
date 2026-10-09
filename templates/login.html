@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Customer Churn Analytics Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Outfit:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <style>
+    body {
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+    .login-card {
+      width: 100%;
+      max-width: 440px;
+      padding: 40px;
+      border-radius: var(--radius-xl);
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border-glow);
+      box-shadow: 0 0 35px rgba(99, 102, 241, 0.2);
+    }
+    .login-brand {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+    .login-brand .logo {
+      width: 56px;
+      height: 56px;
+      border-radius: var(--radius-lg);
+      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 26px;
+      color: white;
+      margin-bottom: 12px;
+      box-shadow: var(--shadow-glow);
+    }
+    .login-brand h2 {
+      font-size: 22px;
+      color: var(--text-primary);
+    }
+    .login-brand p {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+    .alert-error {
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      color: var(--accent-rose);
+      padding: 12px 16px;
+      border-radius: var(--radius-md);
+      font-size: 13px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .credentials-hint {
+      background: rgba(99, 102, 241, 0.1);
+      border: 1px dashed var(--accent-primary);
+      padding: 12px;
+      border-radius: var(--radius-md);
+      text-align: center;
+      margin-top: 24px;
+      font-size: 12px;
+      color: var(--text-secondary);
+    }
+    .credentials-hint strong {
+      color: var(--accent-cyan);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="login-card glass-card">
+    <div class="login-brand">
+      <div class="logo">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <h2>ChurnVision Portal</h2>
+      <p>Customer Churn Analytics & Prediction</p>
+    </div>
+
+    {% if error %}
+    <div class="alert-error">
+      <i class="fa-solid fa-circle-exclamation"></i>
+      <span>{{ error }}</span>
+    </div>
+    {% endif %}
+
+    <form method="POST" action="{{ url_for('login') }}">
+      <div class="form-group">
+        <label for="username"><i class="fa-solid fa-user me-2"></i> Username</label>
+        <input type="text" id="username" name="username" class="form-control" placeholder="Enter admin username" required value="admin">
+      </div>
+
+      <div class="form-group">
+        <label for="password"><i class="fa-solid fa-lock me-2"></i> Password</label>
+        <input type="password" id="password" name="password" class="form-control" placeholder="Enter password" required value="admin123">
+      </div>
+
+      <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px; padding: 14px;">
+        <i class="fa-solid fa-right-to-bracket"></i> Sign In to Dashboard
+      </button>
+    </form>
+
+    <div class="credentials-hint">
+      <i class="fa-solid fa-key me-1"></i> Default Admin Credentials: <strong>admin</strong> / <strong>admin123</strong>
+    </div>
+  </div>
+
+</body>
+</html>

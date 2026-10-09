@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block title %}Reports & CSV Exports - ChurnVision{% endblock %}
+{% block page_title %}Reports & Executive Data Exporter{% endblock %}
+
+{% block content %}
+<!-- Executive Churn Summary Report Box -->
+<div class="glass-card" style="margin-bottom: 32px;">
+  <div class="chart-card-header">
+    <h3><i class="fa-solid fa-file-invoice" style="color: var(--accent-primary);"></i> Executive Customer Churn Summary Report</h3>
+    <a href="{{ url_for('export_summary_csv') }}" class="btn btn-primary">
+      <i class="fa-solid fa-download"></i> Download Summary CSV
+    </a>
+  </div>
+
+  <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 20px; margin-top: 16px;">
+    <div style="background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <span style="font-size: 13px; color: var(--text-muted);">Database Volume</span>
+      <h3 style="font-size: 24px; color: var(--text-primary); margin-top: 4px;" id="rep-total">-- Customers</h3>
+    </div>
+
+    <div style="background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <span style="font-size: 13px; color: var(--text-muted);">Current Churn Rate</span>
+      <h3 style="font-size: 24px; color: var(--accent-rose); margin-top: 4px;" id="rep-rate">--%</h3>
+    </div>
+
+    <div style="background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <span style="font-size: 13px; color: var(--text-muted);">High Risk Accounts</span>
+      <h3 style="font-size: 24px; color: var(--accent-amber); margin-top: 4px;" id="rep-high">-- Customers</h3>
+    </div>
+
+    <div style="background: rgba(15, 23, 42, 0.5); padding: 20px; border-radius: var(--radius-md); border: 1px solid var(--border-color);">
+      <span style="font-size: 13px; color: var(--text-muted);">Est. Revenue at Risk</span>
+      <h3 style="font-size: 24px; color: var(--accent-cyan); margin-top: 4px;" id="rep-rev">$-- / mo</h3>
+    </div>
+  </div>
+</div>
+
+<!-- Download Center Grid -->
+<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px;">
+
+  <!-- 1. Customer Database Export Card -->
+  <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(99, 102, 241, 0.15); color: var(--accent-primary); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;">
+        <i class="fa-solid fa-users"></i>
+      </div>
+      <h3 style="font-size: 18px; color: var(--text-primary); margin-bottom: 8px;">Customer Directory Dataset</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+        Export complete customer profile dataset including tenure, fees, contract types, support call volume, and calculated ML risk scores.
+      </p>
+    </div>
+    <a href="{{ url_for('export_customers_csv') }}" class="btn btn-secondary" style="width: 100%;">
+      <i class="fa-solid fa-file-csv me-1" style="color: var(--accent-emerald);"></i> Export Customers CSV
+    </a>
+  </div>
+
+  <!-- 2. Prediction History Export Card -->
+  <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+      </div>
+      <h3 style="font-size: 18px; color: var(--text-primary); margin-bottom: 8px;">Prediction Audit Logs</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+        Download complete history log of all past machine learning predictions, inputs, confidence scores, and timestamps.
+      </p>
+    </div>
+    <a href="{{ url_for('export_predictions_csv') }}" class="btn btn-secondary" style="width: 100%;">
+      <i class="fa-solid fa-file-csv me-1" style="color: var(--accent-cyan);"></i> Export Prediction Logs CSV
+    </a>
+  </div>
+
+  <!-- 3. Summary Report Export Card -->
+  <div class="glass-card" style="display: flex; flex-direction: column; justify-content: space-between;">
+    <div>
+      <div style="width: 48px; height: 48px; border-radius: var(--radius-md); background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); display: flex; align-items: center; justify-content: center; font-size: 22px; margin-bottom: 16px;">
+        <i class="fa-solid fa-chart-pie"></i>
+      </div>
+      <h3 style="font-size: 18px; color: var(--text-primary); margin-bottom: 8px;">Executive Summary Report</h3>
+      <p style="font-size: 13px; color: var(--text-secondary); line-height: 1.6; margin-bottom: 24px;">
+        Generate high-level aggregated key metrics summary suitable for executive review and retention performance tracking.
+      </p>
+    </div>
+    <a href="{{ url_for('export_summary_csv') }}" class="btn btn-secondary" style="width: 100%;">
+      <i class="fa-solid fa-file-csv me-1" style="color: var(--accent-amber);"></i> Export Executive Summary CSV
+    </a>
+  </div>
+
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    const res = await fetch('/api/stats');
+    const data = await res.json();
+    
+    document.getElementById('rep-total').innerText = `${data.total_customers.toLocaleString()} Customers`;
+    document.getElementById('rep-rate').innerText = `${data.churn_rate}%`;
+    document.getElementById('rep-high').innerText = `${data.high_risk_customers.toLocaleString()} High Risk`;
+    
+    const estRevAtRisk = (data.churned_customers * data.avg_charges).toFixed(2);
+    document.getElementById('rep-rev').innerText = `$${parseFloat(estRevAtRisk).toLocaleString()} / mo`;
+  } catch (err) {
+    console.error("Failed to load report summary metrics:", err);
+  }
+});
+</script>
+{% endblock %}
